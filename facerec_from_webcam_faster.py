@@ -14,12 +14,12 @@ import cv2
 video_capture = cv2.VideoCapture(0)
 
 # Load a sample picture and learn how to recognize it.
-inkyu_image = face_recognition.load_image_file("pics/inkyu.png")
-inkyu_face_encoding = face_recognition.face_encodings(inkyu_image)[0]
-
-# Load a second sample picture and learn how to recognize it.
-pho_image = face_recognition.load_image_file("pics/pho.jpeg")
-pho_face_encoding = face_recognition.face_encodings(pho_image)[0]
+# inkyu_image = face_recognition.load_image_file("pics/inkyu.png")
+# inkyu_face_encoding = face_recognition.face_encodings(inkyu_image)[0]
+#
+# # Load a second sample picture and learn how to recognize it.
+# pho_image = face_recognition.load_image_file("pics/pho.jpeg")
+# pho_face_encoding = face_recognition.face_encodings(pho_image)[0]
 
 jennie_image = face_recognition.load_image_file("pics/jennie.png")
 jennie_face_encoding = face_recognition.face_encodings(jennie_image)[0]
@@ -27,13 +27,13 @@ jennie_face_encoding = face_recognition.face_encodings(jennie_image)[0]
 
 # Create arrays of known face encodings and their names
 known_face_encodings = [
-    inkyu_face_encoding,
-    pho_face_encoding,
+    # inkyu_face_encoding,
+    # pho_face_encoding,
     jennie_face_encoding,
 ]
 known_face_names = [
-    "Oh Inkyu",
-    "Pho Yoonjae",
+    # "Oh Inkyu",
+    # "Pho Yoonjae",
     "Jennie",
 ]
 
