@@ -1,16 +1,21 @@
 import socketserver
+import face_recognition
+import cv2
 
-HOST = ''
+HOST = '127.0.0.1'
 PORT = 9009
 
 
-class MyTcpHandler(socketserver.BaseRequestHandler):
+class MyUdpHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        sock = self.request
-
+        data = self.request[0]
+        socket = self.request[1]
+        print("{} wrote:".format(self.client_address[0]))
+        print(data)
+        socket.sendto(data.upper(), self.client_address)
 
 def runServer():
-    server = socketserver.UDPServer((HOST, PORT), MyTcpHandler)
+    server = socketserver.UDPServer((HOST, PORT), MyUdpHandler)
     server.serve_forever()
 
 
