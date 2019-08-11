@@ -4,7 +4,6 @@ import socket
 import cv2
 import numpy as np
 import face_recognition
-from PIL import Image as PIL_Image
 
 import pymysql
 
@@ -13,6 +12,7 @@ from sqlalchemy.orm import sessionmaker
 
 from database_setup import Base, Images
 
+import face
 import video
 
 def image_process(cv2_img):
@@ -60,30 +60,8 @@ session = DBSession()
 
 images = session.query(Images).all()
 
-# Create arrays of known face encodings and their names
-known_face_encodings = []
-known_face_names = []
-
-# Initialize some variables
-face_locations = []
-face_encodings = []
-face_names = []
-process_this_frame = True
-
-for image in images:
-    src = face_recognition.load_image_file(image.location)
-    height, width, channel = src.shape
-    matrix = cv2.getRotationMatrix2D((width/2, height/2), -90, 1)
-    temp_image = cv2.warpAffine(src, matrix, (width, height))
-
-    cv2.imshow("Moon", src)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    temp_image_encoding = face_recognition.face_encodings(src)[0]
-
-    known_face_encodings.append(temp_image_encoding)
-    known_face_names.append(image.name)
+core = face.Face()
+core.face_encoding(images)
 
 
 # jpeg_encode_func = lambda img: video.incode_video(img)
@@ -119,32 +97,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 # Decode the image
                 img = video.decode_video(img_view[:img_size])
 
-                small_frame = cv2.resize(img, (0, 0), fx=0.25, fy=0.25)
-
-                # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
-                rgb_small_frame = small_frame[:, :, ::-1]
-
-                # Only process every other frame of video to save time
-                if process_this_frame:
-                    # Find all the faces and face encodings in the current frame of video
-                    face_locations = face_recognition.face_locations(rgb_small_frame)
-                    face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
-
-                    face_names = []
-                    for face_encoding in face_encodings:
-                        # See if the face is a match for the known face(s)
-
-                        matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.4)
-                        print(matches)
-                        name = "Unknown"
-
-                        # If a match was found in known_face_encodings, just use the first one.
-                        if True in matches:
-                            first_match_index = matches.index(True)
-                            name = known_face_names[first_match_index]
-                        face_names.append(name)
-
-                process_this_frame = not process_this_frame
+                result = core.run(img)
+                print(result)
 
                 # Process it
                 # res = image_process(img)
