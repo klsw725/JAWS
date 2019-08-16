@@ -7,7 +7,7 @@ import time
 import cv2
 import numpy as np
 
-import video
+import video as _video
 
 host         = "http://localhost:8000/facer/1/face"
 port         = 9009
@@ -34,7 +34,7 @@ def send_data(sock, msg):
 
 
 if __name__ == "__main__":
-    video = video.Video()
+    video = _video.Video()
     video.start()
 
     #get_buffer = lambda: utils.encode_image(cv2.imread("monarch.png",cv2.IMREAD_UNCHANGED), jpeg, jpeg_quality)
@@ -55,12 +55,15 @@ if __name__ == "__main__":
         img_buffer = video.get_buffer()
         if img_buffer is None:
             continue
-        msg = bytes("image{:07}".format(len(img_buffer)), "ascii")
-        try:
-            requests.post(host, data={'msg':msg})
-            requests.post(host, data={'img_buffer':img_buffer})
-        except:
-            print('requests.posts error')
+        temp_img = _video.decode_video(img_buffer)
+        msg = "image"
+        for num in temp_img.shape:
+            temp = ",{}".format(str(num))
+            msg += temp
+
+        requests.post(host, data={'msg':msg, 'img_buffer': np.array2string(temp_img, separator=', ')})
+        # requests.post(host, data={'msg':msg, 'img_buffer': img_buffer})
+
 
     # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
     #     sock.connect((host, port))
