@@ -100,6 +100,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 result = core.run(img)
                 print(result)
 
+
                 # Process it
                 # res = image_process(img)
 
