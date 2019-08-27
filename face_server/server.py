@@ -14,6 +14,7 @@ from database_setup import Base, Images
 
 import face
 import video
+import detect
 
 def image_process(cv2_img):
     # For fun, we play with the image
@@ -63,6 +64,8 @@ images = session.query(Images).all()
 core = face.Face()
 core.face_encoding(images)
 
+eyedetect = detect.EyeDetect()
+
 
 # jpeg_encode_func = lambda img: video.incode_video(img)
 # jpeg_decode_func = lambda buf: video.decode_video(buf)
@@ -97,6 +100,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 # Decode the image
                 img = video.decode_video(img_view[:img_size])
 
+                # total = eyedetect.run(img)
+                # print(total)
                 result = core.run(img)
                 print(result)
 
