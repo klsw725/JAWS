@@ -1,5 +1,7 @@
 import sys
 import socket
+import threading
+from queue import Queue
 
 import cv2
 import numpy as np
@@ -37,6 +39,19 @@ def recv_data_into(sock, buf_view, torecv):
         if numrecv == 0:
             raise RuntimeError("Socket connection broken")
         torecv -= numrecv
+
+def detectFace(core, q1, q2):
+    print("create thread")
+    while True:
+        frame, evt = q1.get()
+        evt.set()
+        q1.task_done()
+        result = core.run(frame)
+        evt = threading.Event()
+        q2.put((result, evt))
+        evt.wait()
+
+
 
 host = '127.0.0.1'
 port = 9009
@@ -86,6 +101,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     conn, addr = s.accept()
     with conn:
         print('Connected by', addr)
+        q1 = Queue()
+        q2 = Queue()
+        thread_one = threading.Thread(target=detectFace, args=(core, q1, q2))
+        thread_one.start()
         while True:
             recv_data_into(conn, tmp_view[:5], 5)
             cmd = tmp_buf[:5].decode('ascii')
@@ -99,10 +118,15 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
                 # Decode the image
                 img = video.decode_video(img_view[:img_size])
-
+                evt = threading.Event()
+                q1.put((img, evt))
+                evt.wait()
                 # total = eyedetect.run(img)
                 # print(total)
-                result = core.run(img)
+                # result = core.run(img)
+                result, evt = q2.get()
+                evt.set()
+                q2.task_done()
                 print(result)
 
 
