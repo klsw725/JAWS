@@ -2,7 +2,6 @@
   "name": "facer",
   "version": "0.1.0",
   "private": true,
-  "proxy" : "http://localhost:8000",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -10,7 +9,6 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
-    "bootstrap": "^4.3.1",
     "core-js": "^2.6.5",
     "jquery": "^3.4.1",
     "popper.js": "^1.15.0",

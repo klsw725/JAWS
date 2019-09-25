@@ -3,6 +3,7 @@ import Vuex from "vuex";
 
 import user from './user';
 import upload from './upload';
+import modal from './modal';
 
 Vue.use(Vuex);
 
@@ -14,5 +15,6 @@ export default new Vuex.Store({
   modules:{
     user,
     upload,
+    modal,
   }
 });

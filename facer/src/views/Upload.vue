@@ -8,6 +8,8 @@
         <button @click="uploadData">Upload</button>
       </p>
 <!--    </form>-->
+    <Modal></Modal>
+
     <UploadList></UploadList>
 
   </div>
@@ -15,6 +17,8 @@
 
 <script>
     import UploadList from "../components/UploadList";
+    import Modal from "../components/Modal";
+
     export default {
       name: "Upload",
       created() {
@@ -22,22 +26,30 @@
       },
       data() {
         return {
-          name: '',
-          user: [],
+            name: '',
+            user: [],
         }
       },
       components:{
-        UploadList,
+          UploadList,
+          Modal,
       },
       methods: {
         async uploadData() {
-          let data = new FormData();
-          let file = this.$refs.photo.files[0];
-          data.append("name", this.name);
-          data.append("image", file);
-          // let res = await this.$axios.post('/api/upload/',data);
-          // this.$store.commit('upload/addList',res);
-          await this.$store.dispatch('upload/upload', {upload: '/api/upload/', data: data});
+            if (this.name !== "" && this.$refs.photo.files[0] !== undefined ) {
+                let data = new FormData();
+                let file = this.$refs.photo.files[0];
+
+                data.append("name", this.name);
+                data.append("image", file);
+                // let res = await this.$axios.post('/api/upload/',data);
+                // this.$store.commit('upload/addList',res);
+                await this.$store.dispatch('upload/upload', {upload: 'http://localhost:8000/api/upload/', data: data});
+                window.location.href = '/';
+            }
+            else{
+                this.$store.commit('modal/setOpen');
+            }
 
         },
       }
@@ -45,5 +57,6 @@
 </script>
 
 <style scoped>
+
 
 </style>

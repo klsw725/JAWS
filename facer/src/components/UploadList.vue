@@ -22,10 +22,11 @@
         },
         methods:{
             async getUpload(){
-                await this.$store.dispatch('upload/getUpload', `/api/upload`)
+                await this.$store.dispatch('upload/getUpload', `http://localhost:8000/api/upload/`)
             },
             async deleteUpload(pk){
-                await this.$store.dispatch('upload/deleteUpload', `/api/upload/${pk}`)
+                await this.$store.dispatch('upload/deleteUpload', `http://localhost:8000/api/upload/${pk}`)
+                window.location.href = '/';
                 // try{
                 //   let res = await this.$axios.delete('/api/upload/'+pk);
                 // window.location.href = '/';

@@ -6,17 +6,14 @@ from queue import Queue
 import cv2
 import numpy as np
 import face_recognition
+import paho.mqtt.client as mqtt
 
 import pymysql
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from database_setup import Base, Images
 
 import face
 import video
 import detect
+# import mqtt
 
 def image_process(cv2_img):
     # For fun, we play with the image
@@ -56,31 +53,21 @@ def detectFace(core, q1, q2):
 host = '127.0.0.1'
 port = 9009
 
-engine = create_engine('mysql+pymysql://root:root@localhost/test')
-
-Base.metadata.bind = engine
-
-DBSession = sessionmaker(bind=engine)
-# A DBSession() instance establishes all conversations with the database
-# and represents a "staging zone" for all the objects loaded into the
-# database session object. Any change made against the objects in the
-# session won't be persisted into the database until you call
-# session.commit(). If you're not happy about the changes, you can
-# revert all of them back to the last commit by calling
-# session.rollback()
-session = DBSession()
-
-
 # jennie_image = face_recognition.load_image_file("pics/jennie.png")
 # jennie_face_encoding = face_recognition.face_encodings(jennie_image)[0]
 
-images = session.query(Images).all()
+conn = pymysql.connect(host='localhost', user='root', password='root',db='test', charset='utf8')
+curs = conn.cursor()
+curs.execute("select * from api_images")
+images = curs.fetchall()
 
 core = face.Face()
 core.face_encoding(images)
 
 eyedetect = detect.EyeDetect()
 
+mqttc = mqtt.Client()      # MQTT Client 오브젝트 생성
+mqttc.connect("127.0.0.1", 1883)    # MQTT 서버에 연결
 
 # jpeg_encode_func = lambda img: video.incode_video(img)
 # jpeg_decode_func = lambda buf: video.decode_video(buf)

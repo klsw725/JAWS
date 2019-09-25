@@ -22,11 +22,11 @@ Base = declarative_base()
 #
 
 class Images(Base):
-    __tablename__ = 'image'
+    __tablename__ = 'api_images'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable=False)
-    location = Column(String(255), nullable=False)
+    image = Column(String(255), nullable=False)
     # data = Column(LargeBinary)
     # description = Column(String(250))
     # price = Column(String(8))

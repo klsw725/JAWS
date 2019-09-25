@@ -22,11 +22,14 @@ class Face():
 
     def face_encoding(self, images):
         for image in images:
-            temp_image = face_recognition.load_image_file(image.location)
+            location = "../mysite/media/" + image[2]
+            temp_image = face_recognition.load_image_file(location)
             temp_image_encoding = face_recognition.face_encodings(temp_image)[0]
 
+
             self.known_face_encodings.append(temp_image_encoding)
-            self.known_face_names.append(image.name)
+            self.known_face_names.append(image[1])
+
 
     def run(self, frame):
         # Resize frame of video to 1/4 size for faster face recognition processing

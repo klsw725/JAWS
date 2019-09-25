@@ -22,7 +22,7 @@ const actions = {
         console.log(res);
         commit('addList', res);
     },
-    async deleteUpload({commit}, upload){
+    async deleteUpload({commit}, upload ){
         await axios.delete(upload);
         commit('deleteList');
     }
@@ -33,10 +33,10 @@ const mutations = {
         state.list = data;
     },
     deleteList(state){
-      state.list.pop();
+      // state.list.pop();
     },
     addList(state, data){
-      state.list.push(data);
+      // state.list.push(data);
     },
 };
 
