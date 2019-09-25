@@ -4,6 +4,8 @@ import router from "./router";
 import store from "./store/store";
 import axios from "axios";
 
+import '@stout/vue-dashed-spinner';
+
 Vue.prototype.$axios = axios;
 Vue.config.productionTip = false;
 

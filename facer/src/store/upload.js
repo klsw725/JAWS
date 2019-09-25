@@ -2,13 +2,16 @@ import axios from "axios";
 
 const state = {
     list: [],
+    ringState: false,
 };
 
 const getters = {
     list: (state, getters, rootState) => {
         return state.list;
     },
-
+    ringState: (state, getters, rootState) => {
+        return state.ringState
+    }
 };
 
 const actions = {
@@ -38,6 +41,12 @@ const mutations = {
     addList(state, data){
       // state.list.push(data);
     },
+    showRing(state){
+        state.ringState = true;
+    },
+    hideRing(state){
+        state.ringState = false;
+    }
 };
 
 export default {
