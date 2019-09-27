@@ -93,6 +93,7 @@ class ImagesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 im = PIL.Image.open(image)
                 imageNDArray = cv2.cvtColor(numpy.array(im), cv2.COLOR_RGB2BGR)
                 imageNDArray = self.Rotate(imageNDArray, num)
+                imageNDArray = cv2.resize(imageNDArray, dsize=(480, 640), interpolation=cv2.INTER_AREA)
                 is_success, im_buf_arr = cv2.imencode(".jpg", imageNDArray)
                 byte_im = im_buf_arr.tobytes()
                 temp = _io.BytesIO(byte_im)
