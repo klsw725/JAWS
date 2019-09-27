@@ -9,7 +9,8 @@
       </p>
 <!--    </form>-->
     <Modal></Modal>
-    <DashedSpinner v-if="ringState">얼굴 분석 중입니다</DashedSpinner>
+    <Ring></Ring>
+
     <UploadList></UploadList>
 
   </div>
@@ -19,6 +20,7 @@
     import {mapGetters} from 'vuex';
     import UploadList from "../components/UploadList";
     import Modal from "../components/Modal";
+    import Ring from "../components/Ring";
 
     export default {
       name: "Upload",
@@ -31,14 +33,10 @@
             user: [],
         }
       },
-      computed: {
-        ...mapGetters({
-          ringState: 'upload/ringState',
-        })
-      },
       components:{
           UploadList,
           Modal,
+          Ring,
       },
       methods: {
         fileValidation(filename){
@@ -52,19 +50,25 @@
         },
         async uploadData() {
             let file = this.$refs.photo.files[0];
-            console.log(file);
             if (this.name !== "" && file !== undefined ) {
               if (this.fileValidation(file.name)){
+                this.$store.commit('ring/showRing');
                 let data = new FormData();
 
                 data.append("name", this.name);
                 data.append("image", file);
                 // let res = await this.$axios.post('/api/upload/',data);
                 // this.$store.commit('upload/addList',res);
-                await this.$store.dispatch('upload/upload', {upload: 'http://localhost:8000/api/upload/', data: data});
-                // window.location.href = '/';
-              }
+                let res = await this.$store.dispatch('upload/upload', {upload: 'http://localhost:8000/api/upload/', data: data});
+                if(res == null){
+                  alert('No Face Here');
+                }
+                this.$store.commit('ring/hideRing');
                 window.location.href = '/';
+              }
+              else {
+                window.location.href = '/';
+              }
 
             }
             else{
@@ -76,6 +80,5 @@
 </script>
 
 <style scoped>
-
 
 </style>
