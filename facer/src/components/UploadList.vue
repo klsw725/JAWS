@@ -12,6 +12,7 @@
     </div>
 </template>
 
+
 <script>
     import {mapGetters} from 'vuex';
     export default {
@@ -21,16 +22,24 @@
                 list: 'upload/list'
             })
         },
+        data() {
+            return {
+              token:'',
+            }
+        },
         created() {
+            this.token = localStorage.getItem("userInfo") ? JSON.parse(localStorage.getItem("userInfo")).token : null;
             this.getUpload();
         },
         methods:{
             async getUpload(){
-                await this.$store.dispatch('upload/getUpload', `http://localhost:8000/api/upload/`)
+                // this.token = localStorage.getItem("userInfo") ? JSON.parse(localStorage.getItem("userInfo")).token : null;
+                await this.$store.dispatch('upload/getUpload', {upload:`http://localhost:8000/api/upload/`, token: this.token});
             },
             async deleteUpload(pk){
-                await this.$store.dispatch('upload/deleteUpload', `http://localhost:8000/api/upload/${pk}`)
-                window.location.href = '/';
+                // const token = localStorage.getItem("userInfo") ? JSON.parse(localStorage.getItem("userInfo")).token : null;
+                await this.$store.dispatch('upload/deleteUpload', {upload:`http://localhost:8000/api/upload/${pk}`, token: this.token})
+                window.location.href = '/upload';
                 // try{
                 //   let res = await this.$axios.delete('/api/upload/'+pk);
                 // window.location.href = '/';

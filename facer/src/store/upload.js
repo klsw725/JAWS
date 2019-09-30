@@ -11,14 +11,28 @@ const getters = {
 };
 
 const actions = {
-    async getUpload({commit}, upload) {
-        let res = await axios.get(upload);
-        commit('setList', res.data);
+    async getUpload({commit}, {upload, token}) {
+        let res = null;
+        try{
+            res = await axios.get(upload,{
+                headers: {
+                    'Authorization': `token ${token}`
+                }
+            });
+        }
+        catch(error){
+            console.log(error);
+        }
+        commit('setList', res.data.results);
     },
-    async upload({commit}, {upload, data}){
+    async upload({commit}, {upload, data, token}){
         let res = null;
         try {
-            res = await axios.post(upload, data);
+            res = await axios.post(upload, data, {
+                headers: {
+                    'Authorization': `token ${token}`
+                }
+            });
         }
         catch(error){
             console.log(error)
@@ -26,8 +40,12 @@ const actions = {
         return res;
         // commit('addList', res);
     },
-    async deleteUpload({commit}, upload ){
-        await axios.delete(upload);
+    async deleteUpload({commit}, {upload, token}){
+        await axios.delete(upload, {
+            headers: {
+                'Authorization': `token ${token}`
+            }
+        });
         commit('deleteList');
     }
 };

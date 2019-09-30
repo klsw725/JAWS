@@ -67,7 +67,7 @@ core.face_encoding(images)
 eyedetect = detect.EyeDetect()
 
 mqttc = mqtt.Client()      # MQTT Client 오브젝트 생성
-mqttc.connect("127.0.0.1", 1883)    # MQTT 서버에 연결
+mqttc.connect("ddotmotion.kr", 8883)    # MQTT 서버에 연결
 
 # jpeg_encode_func = lambda img: video.incode_video(img)
 # jpeg_decode_func = lambda buf: video.decode_video(buf)
@@ -115,6 +115,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 evt.set()
                 q2.task_done()
                 print(result)
+
+                if(result):
+                    print("open")
+                    mqttc.publish("jaws", "open")
+                    break
+
 
 
                 # Process it

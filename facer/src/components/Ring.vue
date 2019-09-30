@@ -1,9 +1,9 @@
 <template>
     <div v-if="ringState">
-        <transition name="modal">
+        <transition name="mymodal">
             <div>
                 <div class="overlay">
-                    <div class="modal">
+                    <div class="mymodal">
                         <DashedSpinner>얼굴 분석 중입니다</DashedSpinner>
                     </div>
                 </div>
@@ -26,7 +26,7 @@
 </script>
 
 <style scoped>
-    .modal {
+    .mymodal {
         width: 500px;
         margin: 0px auto;
         padding: 20px;
@@ -45,7 +45,7 @@
         transition: all 0.2s step-end;
     }
 
-    .fadeIn-enter .modal,
+    .fadeIn-enter .mymodal,
     .fadeIn-leave-active.modal {
         transform: scale(1.1);
     }

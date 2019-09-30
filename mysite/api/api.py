@@ -1,30 +1,29 @@
 import os
 import _io
 from django.conf import settings
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 
-from .models import Images
-from rest_framework import serializers, viewsets, status, mixins
-from rest_framework.decorators import action
+from rest_framework import serializers, viewsets, status, mixins, permissions
 from rest_framework.response import Response
+from knox.models import AuthToken
 
 import cv2
 import face_recognition
 import PIL.Image
 import numpy
 
-# temp_image = face_recognition.load_image_file(location)
-# try:
-# # temp_image_encoding = face_recognition.face_encodings(temp_image)[0]
-# catch:
-
-class ImagesSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Images
-        fields = '__all__'
+from .models import Images, Device
+from .serializers import (
+    SignupUserSerializer,
+    UserSerializer,
+    LoginUserSerializer,
+    ImagesSerializer
+)
 
 
-class ImagesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class ImagesViewSet(viewsets.GenericViewSet):
+    permission_classes = [permissions.IsAuthenticated, ]
     queryset = Images.objects.all()
     serializer_class = ImagesSerializer
 
@@ -45,16 +44,29 @@ class ImagesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     #             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     #     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    def list(self, request):
+        if not Images.objects.filter(owner=request.user).exists():
+            queryset = None
+
+        queryset = Images.objects.filter(owner= request.user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def create(self, request):
         data = self.recogFace(request.data["image"])
         if data != False:
             request.data["image"].file = data
             serializer = ImagesSerializer(data=request.data)
             if serializer.is_valid():
-                serializer.save()
+                serializer.save(owner=request.user)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response("No Face detect", status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "No Face detect"}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         image = Images.objects.get(pk=pk)
@@ -100,3 +112,57 @@ class ImagesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 # cv2.imwrite(image, imageNDArray)
                 return temp
         return False
+
+class SignupViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = User.objects.all()
+    serializer_class = SignupUserSerializer
+
+    def create(self, request):
+        # if len(request.data["userid"]) < 6 or len(request.data["userpw"]) < 4:
+        #     body = {"message": "short field"}
+        #     return Response(body, status=status.HTTP_400_BAD_REQUEST)
+
+        if User.objects.filter(username=request.data["username"]).exists():
+            body = {"message": "이미 있는 아이디 입니다. 다른 아이디를 사용해 주세요"}
+            return Response(body, status=status.HTTP_400_BAD_REQUEST)
+
+        if not Device.objects.filter(devicecode=request.data["devicecode"]).exists():
+            body = {"message": "This is Not our Device"}
+            return Response(body, status=status.HTTP_400_BAD_REQUEST)
+
+        device = Device.objects.get(devicecode=request.data["devicecode"])
+        if device.owner:
+            body = {"message": "This is Not Your Device"}
+            return Response(body, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = SignupUserSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.save()
+            device.owner = User.objects.get(id=serializer.data["id"])
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LoginViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = User.objects.all()
+    serializer_class = LoginUserSerializer
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.validated_data
+            return Response(
+                {
+                    "user": UserSerializer(
+                        user, context=self.get_serializer_context()
+                    ).data,
+                    "token": AuthToken.objects.create(user)[1],
+                }
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+
+

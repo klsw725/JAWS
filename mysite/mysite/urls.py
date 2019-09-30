@@ -18,13 +18,18 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import url, include
 from rest_framework import routers
+from knox import views as knox_views
 
 import api.api
 
 router = routers.DefaultRouter()
 router.register('upload', api.api.ImagesViewSet)
+router.register('signup', api.api.SignupViewSet)
+router.register('login', api.api.LoginViewSet)
+router.register('user', api.api.UserViewSet)
 
 urlpatterns = [
     url(r'^api/', include(router.urls)),
     url(r'^admin/', admin.site.urls),
+    url(r"^api/logout/", knox_views.LogoutView.as_view(), name='knox_logout'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

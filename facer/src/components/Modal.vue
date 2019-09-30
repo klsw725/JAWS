@@ -1,9 +1,9 @@
 <template>
     <div>
-        <transition name="modal">
+        <transition name="mymodal">
             <div v-if="isOpen">
                 <div class="overlay" @click.self="setclose()">
-                    <div class="modal" @click.self="setclose()">
+                    <div class="mymodal" @click.self="setclose()">
                         <h1>에러</h1>
                         <p>빈칸을 모두 채워주셔야 합니다</p>
                     </div>
@@ -33,7 +33,7 @@
 
 <style scoped>
 
-    .modal {
+    .mymodal {
         width: 500px;
         margin: 0px auto;
         padding: 20px;
@@ -52,7 +52,7 @@
         transition: all 0.2s step-end;
     }
 
-    .fadeIn-enter .modal,
+    .fadeIn-enter .mymodal,
     .fadeIn-leave-active.modal {
         transform: scale(1.1);
     }
