@@ -56,7 +56,7 @@ port = 9009
 # jennie_image = face_recognition.load_image_file("pics/jennie.png")
 # jennie_face_encoding = face_recognition.face_encodings(jennie_image)[0]
 
-conn = pymysql.connect(host='localhost', user='root', password='root',db='test', charset='utf8')
+conn = pymysql.connect(host='localhost', user='username', password='password',db='test', charset='utf8')
 curs = conn.cursor()
 curs.execute("select * from api_images")
 images = curs.fetchall()
@@ -66,8 +66,8 @@ core.face_encoding(images)
 
 eyedetect = detect.EyeDetect()
 
-mqttc = mqtt.Client()      # MQTT Client 오브젝트 생성
-mqttc.connect("ddotmotion.kr", 8883)    # MQTT 서버에 연결
+# mqttc = mqtt.Client()      # MQTT Client 오브젝트 생성
+# mqttc.connect("0.0.0.0", 8883)    # MQTT 서버에 연결
 
 # jpeg_encode_func = lambda img: video.incode_video(img)
 # jpeg_decode_func = lambda buf: video.decode_video(buf)
@@ -118,7 +118,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
                 if(result):
                     print("open")
-                    mqttc.publish("jaws", "open")
+                    # mqttc.publish("jaws", "open")
                     break
 
 

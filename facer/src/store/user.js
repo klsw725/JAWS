@@ -20,7 +20,7 @@ const actions = {
         commit('setLogged');
         return res;
     },
-    async logout({comit}, {upload, token}){
+    async logout({commit}, {upload, token}){
         let res = await axios.post (upload, token, {
             headers: {
                 'Authorization': `token ${token}`

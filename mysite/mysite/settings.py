@@ -25,7 +25,7 @@ SECRET_KEY = '(-$1)klot-dtz^9f)zp)sg=y$1yv0k4v+potept0$j*q2r*7+*'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['ddotmotion.kr', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -84,8 +84,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'test', # DB명
-        'USER': 'root', # 데이터베이스 계정
-        'PASSWORD': 'root', # 계정 비밀번호
+        'USER': 'username', # 데이터베이스 계정
+        'PASSWORD': 'password', # 계정 비밀번호
         'HOST': '127.0.0.1', # 데이테베이스 주소(IP)
         'PORT': '3306', # 데이터베이스 포트(보통은 3306)
     }

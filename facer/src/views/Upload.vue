@@ -13,7 +13,7 @@
 <!--              <label class="custom-file-label" for="inputGroupFile02" aria-describedby="inputGroupFileAddon02">Choose file</label>-->
 <!--            </div>-->
             <div class="input-group-append">
-              <button class="input-group-text" id="inputGroupFileAddon01"@click="uploadData">Upload</button>
+              <button class="input-group-text" id="inputGroupFileAddon01" @click="uploadData">Upload</button>
             </div>
 <!--            <input type=file name="file" ref="photo">-->
 
