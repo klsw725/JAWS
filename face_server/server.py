@@ -15,7 +15,6 @@ import pymysql
 import face
 import video
 import detect
-# import mqtt
 
 from PIL import Image
 
@@ -57,54 +56,16 @@ def detectFace(core, q1, q2):
         evt.wait()
 
 
-# host = '127.0.0.1'
-# port = 9009
-host = '192.168.0.77'
-port = 8080
-
-# jennie_image = face_recognition.load_image_file("pics/jennie.png")
-# jennie_face_encoding = face_recognition.face_encodings(jennie_image)[0]
-
-conn = pymysql.connect(host='localhost', user='username', password='password', db='test', charset='utf8')
-curs = conn.cursor()
-curs.execute("select * from api_images")
-images = curs.fetchall()
-
-core = face.Face()
-core.face_encoding(images)
-
-eyedetect = detect.EyeDetect()
-
-mqttc = mqtt.Client()      # MQTT Client 오브젝트 생성
-mqttc.connect("ddotmotion.kr", 9883)    # MQTT 서버에 연결
-
-# jpeg_encode_func = lambda img: video.incode_video(img)
-# jpeg_decode_func = lambda buf: video.decode_video(buf)
-
-# A temporary buffer in which the received data will be copied
-# this prevents creating a new buffer all the time
-tmp_buf = bytearray(12)
-tmp_view = memoryview(tmp_buf)  # this allows to get a reference to a slice of tmp_buf
-
-# Creates a temporary buffer which can hold the largest image we can transmit
-img_buf = bytearray(9999999)
-img_view = memoryview(img_buf)
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((host, port))
-    s.listen(1)
-    conn, addr = s.accept()
-    with conn:
-        print('Connected by', addr)
-        q1 = Queue()
-        q2 = Queue()
-        thread_one = threading.Thread(target=detectFace, args=(core, q1, q2))
-        thread_one.start()
+def handle_client(conn, addr):
+    print('Connected by', addr)
+    q1 = Queue()
+    q2 = Queue()
+    thread_one = threading.Thread(target=detectFace, args=(core, q1, q2))
+    thread_one.start()
+    try:
         while True:
             recv_data_into(conn, tmp_view, 12)
-            # try:
             cmd = tmp_buf.decode('ASCII')
-            # except:
             # cmd = conn.recv(999999999)
             if cmd[:5] == 'image':
                 # Read the image buffer size
@@ -120,20 +81,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 # # Decode the image
 
                 img = video.decode_video(img_view[:img_size])
-                # print(img)
 
-                #
-                # Display the resulting image
-
-                # cv2.imshow('Video', img)
-                #
-                #
-                # # Hit 'q' on the keyboard to quit!
-                # if cv2.waitKey(1) & 0xFF == ord('q'):
-                #     break
                 evt = threading.Event()
                 q1.put((img, evt))
                 evt.wait()
+
                 # total = eyedetect.run(img)
                 # print(total)
                 # result = core.run(img)
@@ -146,22 +98,53 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     print("open")
                     mqttc.publish("jaws", "open")
                     break
-                #
-                #
-                #
-                # # Process it
-                # # res = image_process(img)
-                #
-                # # Encode the image
-                # # res_buffer = video.incode_video(res)
-                #
-                # # # Make the reply
-                # # reply = bytes("image{:07}".format(len(res_buffer)), "ascii")
-                # # utils.send_data(conn, reply)
-                # # utils.send_data(conn, res_buffer)
-                # # utils.send_data(conn, bytes('enod!', 'ascii'))
+
             elif cmd == 'quit!':
                 break
             else:
                 print("Got something else")
-        print("Quitting")
+    except:
+        print("Server Close")
+        conn.close();
+
+
+host = '127.0.0.1'
+port = 9009
+
+conn = pymysql.connect(host='localhost', user='username', password='password', db='test', charset='utf8')
+curs = conn.cursor()
+curs.execute("select * from api_images")
+images = curs.fetchall()
+
+core = face.Face()
+core.face_encoding(images)
+
+eyedetect = detect.EyeDetect()
+
+mqttc = mqtt.Client()      # MQTT Client 오브젝트 생성
+mqttc.connect("ddotmotion.kr", 9883)    # MQTT 서버에 연결
+
+# A temporary buffer in which the received data will be copied
+# this prevents creating a new buffer all the time
+tmp_buf = bytearray(12)
+tmp_view = memoryview(tmp_buf)  # this allows to get a reference to a slice of tmp_buf
+
+# Creates a temporary buffer which can hold the largest image we can transmit
+img_buf = bytearray(9999999)
+img_view = memoryview(img_buf)
+
+if __name__ == "__main__":
+    while True:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+                s.bind((host, port))
+                s.listen(5)
+                conn, addr = s.accept()
+                server_t = threading.Thread(target=handle_client, args=(conn, addr))
+                server_t.daemon = True
+                server_t.start()
+
+        except KeyboardInterrupt:
+            print("Keyboard interrupt")
