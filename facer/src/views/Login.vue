@@ -44,7 +44,8 @@
                     data.append("username", this.id);
                     data.append("password", this.pw);
 
-                    let res = await this.$store.dispatch('user/login', {upload:'http://localhost:8000/api/login/', data: data})
+                    // let res = await this.$store.dispatch('user/login', {upload:'http://localhost:8000/api/login/', data: data})
+                    let res = await this.$store.dispatch('user/login', {upload:'http://ddotmotion.kr:8881/api/login/', data: data})
                     if (res.status === 200) {
                         localStorage.setItem(
                             "userInfo",
@@ -56,6 +57,10 @@
                         );
                         // this.$store.dispatch('user/getMe');
                         this.$router.push({name: 'upload'});
+                    }
+                    else if(res.stats==400){
+                        alert(res.data.message);
+                        window.location.href = '/';
                     }
 
                     // let res = await this.$store.dispatch('upload/upload', {upload: 'http://localhost:8000/api/signin/', data: data});

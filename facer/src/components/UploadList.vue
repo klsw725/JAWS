@@ -34,7 +34,8 @@
         methods:{
             async getUpload(){
                 // this.token = localStorage.getItem("userInfo") ? JSON.parse(localStorage.getItem("userInfo")).token : null;
-                await this.$store.dispatch('upload/getUpload', {upload:`http://localhost:8000/api/upload/`, token: this.token});
+                await this.$store.dispatch('upload/getUpload', {upload:`http://ddotmotion.kr:8881/api/upload/`, token: this.token});
+                // await this.$store.dispatch('upload/getUpload', {upload:`http://localhost:8000/api/upload/`, token: this.token});
             },
             async deleteUpload(pk){
                 // const token = localStorage.getItem("userInfo") ? JSON.parse(localStorage.getItem("userInfo")).token : null;

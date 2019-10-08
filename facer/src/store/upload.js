@@ -21,7 +21,7 @@ const actions = {
             });
         }
         catch(error){
-            console.log(error);
+            res = error.response;
         }
         commit('setList', res.data.results);
     },
@@ -35,7 +35,7 @@ const actions = {
             });
         }
         catch(error){
-            console.log(error)
+            res = error.response;
         }
         return res;
         // commit('addList', res);

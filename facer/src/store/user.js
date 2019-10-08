@@ -12,21 +12,40 @@ const getters = {
 
 const actions = {
     async signup({commit}, {upload, data}){
-        let res = await axios.post(upload, data);
+        let res = null;
+        try {
+            res = await axios.post(upload, data);
+        }
+        catch (error){
+            res = error.response;
+        }
+
         return res;
     },
     async login({commit}, {upload, data}){
-        let res = await axios.post(upload, data);
-        commit('setLogged');
+        let res = null;
+        try {
+            res = await axios.post(upload, data);
+            commit('setLogged');
+        }
+        catch(error){
+            res = error.response;
+        }
         return res;
     },
     async logout({commit}, {upload, token}){
-        let res = await axios.post (upload, token, {
-            headers: {
-                'Authorization': `token ${token}`
-            }
-        });
-        commit('disableLogged');
+        let res = null;
+        try {
+            res = await axios.post(upload, token, {
+                headers: {
+                    'Authorization': `token ${token}`
+                }
+            });
+            commit('disableLogged');
+        }
+        catch(error){
+            res = error.response;
+        }
         return res;
     }
 };

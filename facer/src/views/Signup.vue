@@ -44,6 +44,10 @@
                     if (res.status === 201) {
                         this.$router.push({name: 'login'});
                     }
+                    else if(res.status == 400){
+                        alert(res.data.message);
+                        window.location.href = '/signup';
+                    }
                     // let res = await this.$store.dispatch('upload/upload', {upload: 'http://localhost:8000/api/signup/', data: data});
                     // window.location.href = '/';
                 }

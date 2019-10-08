@@ -74,9 +74,10 @@
                 // let res = await this.$axios.post('/api/upload/',data);
                 // this.$store.commit('upload/addList',res);
                 const token = localStorage.getItem("userInfo") ? JSON.parse(localStorage.getItem("userInfo")).token : null;
-                let res = await this.$store.dispatch('upload/upload', {upload: 'http://localhost:8000/api/upload/', data: data, token: token});
-                if(res.data['message']){
-                  alert('No Face Here');
+                // let res = await this.$store.dispatch('upload/upload', {upload: 'http://localhost:8000/api/upload/', data: data, token: token});
+                let res = await this.$store.dispatch('upload/upload', {upload: 'http://ddotmotion.kr:8881/api/upload/', data: data, token: token});
+                if(res.status == 400){
+                  alert(res.data.message);
                 }
                 this.$store.commit('ring/hideRing');
                 window.location.href = '/upload';
