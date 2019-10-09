@@ -2,6 +2,7 @@
 
 import face_recognition
 import cv2
+import pickle
 
 
 class Face():
@@ -22,11 +23,14 @@ class Face():
 
     def face_encoding(self, images):
         for image in images:
-            location = "../mysite/media/" + image[2]
-            temp_image = face_recognition.load_image_file(location)
-            temp_image_encoding = face_recognition.face_encodings(temp_image)[0]
+            with open(image[4], 'rb') as file:
+                temp_image_encoding = pickle.load(file)
 
-
+            # location = "../mysite/media/" + image[2]
+            # temp_image = face_recognition.load_image_file(location)
+            # temp_image_encoding = face_recognition.face_encodings(temp_image)[0]
+            #
+            #
             self.known_face_encodings.append(temp_image_encoding)
             self.known_face_names.append(image[1])
 

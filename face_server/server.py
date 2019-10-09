@@ -9,6 +9,7 @@ import cv2
 import numpy as np
 import face_recognition
 import paho.mqtt.client as mqtt
+import pickle
 
 import pymysql
 
@@ -58,6 +59,12 @@ def detectFace(core, q1, q2):
 
 def handle_client(conn, addr):
     print('Connected by', addr)
+    sql = pymysql.connect(host='localhost', user='username', password='password', db='test', charset='utf8')
+    curs = sql.cursor()
+    curs.execute("select * from api_images")
+    images = curs.fetchall()
+    core.face_encoding(images)
+
     q1 = Queue()
     q2 = Queue()
     thread_one = threading.Thread(target=detectFace, args=(core, q1, q2))
@@ -119,13 +126,13 @@ def handle_client(conn, addr):
 host = '127.0.0.1'
 port = 9009
 
-conn = pymysql.connect(host='localhost', user='username', password='password', db='test', charset='utf8')
-curs = conn.cursor()
-curs.execute("select * from api_images")
-images = curs.fetchall()
+# conn = pymysql.connect(host='localhost', user='username', password='password', db='test', charset='utf8')
+# curs = conn.cursor()
+# curs.execute("select * from api_images")
+# images = curs.fetchall()
 
 core = face.Face()
-core.face_encoding(images)
+# core.face_encoding(images)
 
 eyedetect = detect.EyeDetect()
 

@@ -1,11 +1,11 @@
 <template>
     <div>
         <table class="userlist">
-            <li v-for="index in list">
+            <li v-bind:key="index" v-for="index in list">
                 <tr>
                     <td class="username">{{index.name}}</td>
                     <td><img class="thumbnail" :src="index.image"></td>
-                    <td><button class="delete" type="button" @click="deleteUpload(index.id)">Delete</button></td>
+                    <td><button class="delete btn btn-primary" type="button" @click="deleteUpload(index.id)">Delete</button></td>
                 </tr>
             </li>
         </table>
