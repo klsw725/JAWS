@@ -19,14 +19,15 @@ def decode_base64(data, altchars=b'+/'):
     return base64.b64decode(data, altchars)
 
 def incode_video(img):
-    encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), 100]
+    encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), 70]
     result, incode_img = cv2.imencode('.jpg', img, encode_params)
     return incode_img.tobytes()
 
 
 def decode_video(bimg):
-    decodeImg = decode_base64(bimg)
-    img_array = np.frombuffer(decodeImg, dtype=np.dtype('uint8'))
+    # decodeImg = decode_base64(bimg)
+    # img_array = np.frombuffer(decodeImg, dtype=np.dtype('uint8'))
+    img_array = np.frombuffer(bimg, dtype=np.dtype('uint8'))
     # Decode a colored image
     return  cv2.imdecode(img_array, flags=cv2.IMREAD_UNCHANGED)
 

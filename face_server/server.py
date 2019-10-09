@@ -82,6 +82,13 @@ def handle_client(conn, addr):
 
                 img = video.decode_video(img_view[:img_size])
 
+                # Display the resulting image
+                # cv2.imshow('Video', img)
+                #
+                # # Hit 'q' on the keyboard to quit!
+                # if cv2.waitKey(1) & 0xFF == ord('q'):
+                #     break
+
                 evt = threading.Event()
                 q1.put((img, evt))
                 evt.wait()
@@ -97,6 +104,7 @@ def handle_client(conn, addr):
                 if (result):
                     print("open")
                     mqttc.publish("jaws", "open")
+                    conn.close()
                     break
 
             elif cmd == 'quit!':
@@ -105,7 +113,7 @@ def handle_client(conn, addr):
                 print("Got something else")
     except:
         print("Server Close")
-        conn.close();
+        conn.close()
 
 
 host = '127.0.0.1'
@@ -134,6 +142,7 @@ img_buf = bytearray(9999999)
 img_view = memoryview(img_buf)
 
 if __name__ == "__main__":
+    print("main server start")
     while True:
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

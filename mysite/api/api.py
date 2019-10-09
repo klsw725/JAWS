@@ -3,6 +3,8 @@ import _io
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.http.request import QueryDict
+
 
 from rest_framework import serializers, viewsets, status, mixins, permissions
 from rest_framework.response import Response
@@ -12,6 +14,8 @@ import cv2
 import face_recognition
 import PIL.Image
 import numpy
+import datetime
+import pickle
 
 from .models import Images, Device
 from .serializers import (
@@ -61,17 +65,26 @@ class ImagesViewSet(viewsets.GenericViewSet):
         data = self.recogFace(request.data["image"])
         if data != False:
             request.data["image"].file = data
+            # with open('james.p', 'wb') as file:
+            #     pickle.dump(encodings_data, file)
+            encoding_file = '{0}/{1}'.format(settings.BASE_DIR, 'encodings/temp.pkl')
+            suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
+            filename = "{0}_{1}".format(request.user, suffix)
+            encoding_rename = '{0}/{1}/{2}'.format(settings.BASE_DIR, 'encodings', filename)
+            os.rename(encoding_file, encoding_rename)
+
             serializer = ImagesSerializer(data=request.data)
             if serializer.is_valid():
-                serializer.save(owner=request.user)
+                serializer.save(owner=request.user, encoding=encoding_rename)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message": "No Face detect"}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         image = Images.objects.get(pk=pk)
-        image.delete()
+        os.remove(str(image.encoding))
         os.remove('{0}/{1}'.format(settings.MEDIA_ROOT, str(image.image)))
+        image.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def Rotate(self, src, degrees):
@@ -97,11 +110,13 @@ class ImagesViewSet(viewsets.GenericViewSet):
         num = 0
         for i in range(4):
             try:
-                face_recognition.face_encodings(temp_image)[0]
+                encodings_image = face_recognition.face_encodings(temp_image)[0]
             except:
                 num = num + 90
                 temp_image = self.Rotate(temp_image, num)
             else:
+                with open('{0}/{1}'.format(settings.BASE_DIR, 'encodings/temp.pkl'), 'wb') as file:
+                    pickle.dump(encodings_image, file)
                 im = PIL.Image.open(image)
                 imageNDArray = cv2.cvtColor(numpy.array(im), cv2.COLOR_RGB2BGR)
                 imageNDArray = self.Rotate(imageNDArray, num)

@@ -39,7 +39,8 @@
             },
             async deleteUpload(pk){
                 // const token = localStorage.getItem("userInfo") ? JSON.parse(localStorage.getItem("userInfo")).token : null;
-                await this.$store.dispatch('upload/deleteUpload', {upload:`http://localhost:8000/api/upload/${pk}`, token: this.token})
+                // await this.$store.dispatch('upload/deleteUpload', {upload:`http://localhost:8000/api/upload/${pk}`, token: this.token})
+                await this.$store.dispatch('upload/deleteUpload', {upload:`http://ddotmotion.kr:8881/api/upload/${pk}`, token: this.token})
                 window.location.href = '/upload';
                 // try{
                 //   let res = await this.$axios.delete('/api/upload/'+pk);

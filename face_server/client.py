@@ -113,7 +113,8 @@ if __name__ == "__main__":
                     idx = 0
             print()
             print("Closing the socket")
-    except:
+    except Exception as e:
+        print(e)
         print("Stopping the grabber")
         video.stop()
 
